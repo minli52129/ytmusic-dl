@@ -1,0 +1,62 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      yt_dlp_version:
+        description: "yt-dlp 版本（留空 = 最新，例如 2025.06.09）"
+        required: false
+        default: ""
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 构建内置 yt-dlp（PyInstaller 独立二进制）
+        run: bash scripts/build-ytdlp.sh "${{ github.event.inputs.yt_dlp_version }}"
+
+      - name: 下载内置 ffmpeg / ffprobe（ARM64 静态版）
+        run: bash scripts/fetch-ffmpeg.sh
+
+      - name: 生成 Xcode 工程
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: 编译 App
+        run: |
+          xcodebuild -project YTMusicDL.xcodeproj \
+            -scheme YTMusicDL \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY=- \
+            -quiet
+
+      - name: 组装并 ad-hoc 签名
+        run: bash scripts/assemble.sh
+
+      - name: 上传 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YTMusicDL-macos-arm64
+          path: YTMusicDL-macos-arm64.zip
+
+      - name: 发布 Release（仅 tag 触发）
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: YTMusicDL-macos-arm64.zip

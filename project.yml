@@ -1,0 +1,41 @@
+name: YTMusicDL
+
+options:
+  bundleIdPrefix: com.rudylee
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "13.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: false
+    ENABLE_USER_SCRIPT_SANDBOXING: false
+    PRODUCT_BUNDLE_IDENTIFIER: com.rudylee.ytmusicdl
+
+targets:
+  YTMusicDL:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    info:
+      path: Support/Info.plist
+      properties:
+        CFBundleDisplayName: YTMusicDL
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+
+schemes:
+  YTMusicDL:
+    build:
+      targets:
+        YTMusicDL: all
+    run:
+      config: Debug
+    archive:
+      config: Release

@@ -1,0 +1,8 @@
+build/
+dist/
+DerivedData/
+*.zip
+YTMusicDL.xcodeproj/
+.DS_Store
+*.pyc
+__pycache__/
