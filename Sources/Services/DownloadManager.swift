@@ -180,7 +180,7 @@ final class DownloadManager: ObservableObject {
         args += ["--newline"]
         args += ["-P", task.outputDir]
         if isPlaylistURL(task.url) {
-            args += ["--yes-playlist", "-o", "%(playlist_title)s/%(playlist_index)02d - %(title)s.%(ext)s"]
+            args += ["--yes-playlist", "-o", "%(playlist_title)s/%(title)s.%(ext)s"]
         } else {
             args += ["--no-playlist", "-o", "%(title)s.%(ext)s"]
         }
